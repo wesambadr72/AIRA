@@ -1,4 +1,5 @@
-import { Loader2, FileDown } from 'lucide-react'
+import { useEffect } from 'react'
+import { Loader2 } from 'lucide-react'
 import type { ChatMessage } from '../hooks/useAIEngine'
 import { Logo } from './Header'
 
@@ -19,6 +20,9 @@ export default function ChatWorkspace({
   t,
   chatEndRef
 }: ChatWorkspaceProps) {
+  useEffect(() => {
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [chatMessages, isAnalyzing])
   const parseInlineMarkdown = (text: string) => {
     const regex = /(\*\*.*?\*\*|`.*?`)/g
     const parts = text.split(regex)
@@ -57,7 +61,7 @@ export default function ChatWorkspace({
 
           if (line.startsWith('* ') || line.startsWith('- ')) {
             return (
-              <li key={idx} className="ml-5 list-disc text-sm sm:text-base leading-relaxed text-inherit">
+              <li key={idx} className="ms-5 list-disc text-sm sm:text-base leading-relaxed text-inherit">
                 {parseInlineMarkdown(line.slice(2))}
               </li>
             )
@@ -68,7 +72,7 @@ export default function ChatWorkspace({
             const num = numListMatch[1]
             const rest = numListMatch[2]
             return (
-              <div key={idx} className="flex gap-2 ml-4 my-1 text-sm sm:text-base align-top text-inherit">
+              <div key={idx} className="flex gap-2 ms-4 my-1 text-sm sm:text-base align-top text-inherit">
                 <span className="font-bold text-brand-logo dark:text-brand-logo shrink-0">{num}.</span>
                 <span className="leading-relaxed">{parseInlineMarkdown(rest)}</span>
               </div>
@@ -77,7 +81,7 @@ export default function ChatWorkspace({
 
           if (line.startsWith('> ')) {
             return (
-              <blockquote key={idx} className="border-l-2 border-brand-logo dark:border-brand-logo pl-3 py-1 my-2 bg-raspberry-plum-950/10 dark:bg-raspberry-plum-950/10 text-brand-logo dark:text-brand-logo rounded-r-md text-md">
+              <blockquote key={idx} className="border-s-2 border-brand-logo dark:border-brand-logo ps-3 py-1 my-2 bg-raspberry-plum-950/10 dark:bg-raspberry-plum-950/10 text-brand-logo dark:text-brand-logo rounded-e-md text-md">
                 {parseInlineMarkdown(line.slice(2))}
               </blockquote>
             )
@@ -125,11 +129,11 @@ export default function ChatWorkspace({
             className={`flex flex-col space-y-2 p-5 rounded-2xl border transition-all max-w-[85%] sm:max-w-[75%] ${
               msg.role === 'user'
                 ? (isDarkMode 
-                    ? 'bg-raspberry-plum-950/30 border-raspberry-plum-900/10 text-right items-end rounded-tr-none' 
-                    : 'bg-raspberry-plum-50/40 border-raspberry-plum-100 text-right items-end rounded-tr-none')
+                    ? 'bg-raspberry-plum-950/30 border-raspberry-plum-900/10 text-end items-end rounded-se-none' 
+                    : 'bg-raspberry-plum-50/40 border-raspberry-plum-100 text-end items-end rounded-se-none')
                 : (isDarkMode 
-                    ? 'bg-raspberry-plum-950/20 border-raspberry-plum-800/20 text-left items-start rounded-tl-none' 
-                    : 'bg-white border-raspberry-plum-200 text-left items-start rounded-tl-none')
+                    ? 'bg-raspberry-plum-950/20 border-raspberry-plum-800/20 text-start items-start rounded-ss-none' 
+                    : 'bg-white border-raspberry-plum-200 text-start items-start rounded-ss-none')
             }`}
           >
             <div className="flex items-center gap-2 text-xs text-raspberry-plum-400 font-semibold">
@@ -144,24 +148,16 @@ export default function ChatWorkspace({
               <span>{msg.timestamp}</span>
             </div>
 
-            <div className="text-inherit text-sm sm:text-base leading-relaxed wrap-break-word text-left w-full">
+            <div className="text-inherit text-sm sm:text-base leading-relaxed wrap-break-word text-start w-full">
               {renderMessageContent(msg.content)}
             </div>
-
-            {msg.actionType && msg.actionType !== 'normal' && (
-              <div className="mt-3 flex gap-2">
-                <button className="flex items-center gap-1.5 text-xs bg-brand-logo/10 hover:bg-brand-logo/25 text-brand-logo dark:text-raspberry-plum-400 border border-raspberry-plum-700/20 px-3 py-1 rounded-md transition-all">
-                  <FileDown className="w-3.5 h-3.5" /> {t.exportReport}
-                </button>
-              </div>
-            )}
           </div>
         </div>
       ))}
 
       {isAnalyzing && (
         <div className="flex w-full justify-start">
-          <div className="flex flex-col space-y-3 p-5 rounded-2xl bg-raspberry-plum-950/10 dark:bg-raspberry-plum-950/20 border border-raspberry-plum-900/10 text-left animate-pulse max-w-[85%] sm:max-w-[75%] rounded-tl-none w-full">
+          <div className="flex flex-col space-y-3 p-5 rounded-2xl bg-raspberry-plum-950/10 dark:bg-raspberry-plum-950/20 border border-raspberry-plum-900/10 text-start animate-pulse max-w-[85%] sm:max-w-[75%] rounded-ss-none w-full">
             <div className="flex items-center gap-2 text-xs text-raspberry-plum-400 font-semibold">
               <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-logo" />
               <span>{t.analyzing}</span>

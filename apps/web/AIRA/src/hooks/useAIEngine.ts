@@ -10,6 +10,27 @@ export interface ChatMessage {
   suggestedAction?: string
 }
 
+const isSelfIntro = (q: string): boolean => {
+  const clean = q.toLowerCase().trim()
+  return (
+    clean.includes('who are you') ||
+    clean.includes('who are u') ||
+    clean.includes('what is your name') ||
+    clean.includes("what's your name") ||
+    clean.includes('introduce yourself') ||
+    clean.includes('who is aira') ||
+    clean.includes('من أنت') ||
+    clean.includes('من انت') ||
+    clean.includes('ما اسمك') ||
+    clean.includes('ما الاسم') ||
+    clean.includes('عرف عن نفسك') ||
+    clean.includes('أنت مين') ||
+    clean.includes('انت مين') ||
+    clean.includes('من هي أيرا') ||
+    clean.includes('من هي aira')
+  )
+}
+
 export function useAIEngine(
   files: AppFile[],
   lang: 'en' | 'ar',
@@ -21,7 +42,9 @@ export function useAIEngine(
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
 
   const runSimulatedAnalysis = async (userQuery: string, type: 'summarize' | 'compare' | 'recommend' | 'normal') => {
-    if (files.length === 0) {
+    setQuery('') // Clear the query input field immediately
+
+    if (files.length === 0 && !isSelfIntro(userQuery)) {
       setChatMessages((prev) => [
         ...prev,
         {
@@ -33,7 +56,7 @@ export function useAIEngine(
         {
           id: Math.random().toString(),
           role: 'assistant',
-          content: t.noDocsWarning,
+          content: t.noSourceWarning,
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           actionType: 'normal'
         }
@@ -43,7 +66,9 @@ export function useAIEngine(
 
     setIsAnalyzing(true)
     setQuery('')
+    setAnalysisStep(lang === 'en' ? '🔍 Initializing agent coordination...' : '🔍 تهيئة تنسيق الوكلاء...')
 
+    // Add user message
     setChatMessages((prev) => [
       ...prev,
       {
@@ -54,135 +79,116 @@ export function useAIEngine(
       }
     ])
 
-    const steps = lang === 'en' ? [
-      '🔍 Reading uploaded documents...',
-      '⚙️ Parsing structural data & tables...',
-      '🧠 Processing queries through AIRA Neural Engine...',
-      '✍️ Drafting output response...'
-    ] : [
-      '🔍 قراءة المستندات المرفوعة...',
-      '⚙️ تحليل الجداول والبيانات الهيكلية...',
-      '🧠 معالجة الاستعلامات عبر محرك AIRA العصبي...',
-      '✍️ كتابة مسودة استجابة المخرجات...'
-    ]
+    const assistantMessageId = Math.random().toString()
+    let assistantText = ''
 
-    for (const step of steps) {
-      setAnalysisStep(step)
-      await new Promise((resolve) => setTimeout(resolve, 800))
-    }
+    try {
+      const sessionId = sessionStorage.getItem('aira_session_id') || ''
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query: userQuery,
+          fileIds: files.map((f) => f.id),
+          history: chatMessages.map((m) => ({ role: m.role, content: m.content })),
+          actionType: type,
+          lang: lang,
+          sessionId: sessionId
+        })
+      })
 
-    setIsAnalyzing(false)
-
-    let assistantReply = ''
-    let actionLabel: 'summarize' | 'compare' | 'recommend' | 'normal' = 'normal'
-
-    if (type === 'summarize') {
-      actionLabel = 'summarize'
-      assistantReply = lang === 'en' 
-        ? `### 📋 Document Analysis Summary
-Here is the condensed executive summary of your uploaded files (**${files.map(f => f.name).join(', ')}**):
-
-1. **Market Landscape & Capital Activity**: 
-   The \`Market_Analysis_2026.pdf\` highlights a strong shift towards agentic system platforms in Q1 2026, recording a **45% increase** in capital allocation compared to Q4 2025.
-2. **Operational Milestones**:
-   Cross-referencing \`Project_Milestones.csv\`, the project milestones track a consistent delivery velocity, with the core LLM pipelines completed **2 weeks ahead of schedule**.
-3. **Identified Bottlenecks**:
-   Deployment latency in secondary staging environments is currently lagging by **12%** due to integration overhead.
-
-> **💡 Key Decision Point:** To scale successfully by Q3, focus resources on optimizing API layer response times and consolidating staging frameworks.`
-        : `### 📋 ملخص تحليل المستندات
-هذا هو الملخص التنفيذي المكثف لملفاتك المرفوعة (**${files.map(f => f.name).join(', ')}**):
-
-1. **مشهد السوق والنشاط الاستثماري**: 
-   يوضح ملف \`Market_Analysis_2026.pdf\` تحولاً قوياً نحو منصات الأنظمة الوكيلة في الربع الأول من عام 2026، حيث سجل **زيادة بنسبة 45%** في رأس المال المخصص مقارنة بالربع الرابع من عام 2025.
-2. **المعالم التشغيلية للمشروع**:
-   بالإشارة إلى ملف \`Project_Milestones.csv\`، تتبع معالم المشروع سرعة تسليم ثابتة، مع اكتمال خطوط أنابيب نماذج اللغة الكبيرة الأساسية **قبل الموعد المحدد بأسبوعين**.
-3. **الاختناقات المحددة**:
-   يتأخر زمن انتقال النشر في البيئات المؤقتة الثانوية حالياً بنسبة **12%** بسبب أعباء التكامل البرمجية.
-
-> **💡 نقطة القرار الرئيسية:** لتحقيق التوسع بنجاح بحلول الربع الثالث، ركز الموارد على تحسين أوقات استجابة طبقة واجهة برمجة التطبيقات ودمج أطر عمل النشر المؤقتة.`
-    } else if (type === 'compare') {
-      actionLabel = 'compare'
-      assistantReply = lang === 'en'
-        ? `### 📊 Cross-Document Comparison
-
-I have cross-compared the operational velocity with market standards. Here is the analysis:
-
-| Metrics / Parameters | Market Standard (2026) | AIRA Project (Current) | Variance |
-| :--- | :--- | :--- | :--- |
-| **Development Velocity** | 12 weeks / release | 9 weeks / release | **+25% Faster** 🟢 |
-| **Pipeline Latency** | < 280ms average | 320ms average | **-14% Latency** 🔴 |
-| **Resource Efficiency** | 76% average utilization | 88% average utilization | **+12% Optimal** 🟢 |
-
-**Key Findings:**
-- Your current speed is superior, but API throughput constraints represent the single critical risk in scaling this architecture.`
-        : `### 📊 مقارنة المستندات المتقاطعة
-
-لقد قمت بمقارنة السرعة التشغيلية بمعايير السوق الحالية. إليك نتائج التحليل:
-
-| المقاييس / المعايير | معيار السوق (2026) | مشروع AIRA (الحالي) | التباين |
-| :--- | :--- | :--- | :--- |
-| **سرعة التطوير** | 12 أسبوعاً / إصدار | 9 أسابيع / إصدار | **+25% أسرع** 🟢 |
-| **زمن استجابة الخط** | < 280ms في المتوسط | 320ms في المتوسط | **-14% تأخير** 🔴 |
-| **كفاءة الموارد** | 76% متوسط الاستغلال | 88% متوسط الاستغلال | **+12% أمثل** 🟢 |
-
-**النتائج الرئيسية:**
-- سرعتك الحالية ممتازة ومتفوقة، لكن قيود إنتاجية واجهة برمجة التطبيقات تمثل خطراً حرجاً فردياً في توسيع هذه البنية.`
-    } else if (type === 'recommend') {
-      actionLabel = 'recommend'
-      assistantReply = lang === 'en'
-        ? `### 🚀 Actionable Recommendations for AIRA
-
-Based on the uploaded files, I recommend the following execution plan:
-
-* **Short-Term (1-2 Weeks):** 
-  Optimize the backend indexing query pipeline to reduce the 320ms latency down to the 280ms threshold.
-* **Medium-Term (1 Month):**
-  Automate the report creation by establishing an automated continuous ingestion pipeline for new CSV logs.
-* **Long-Term (Q3 2026):**
-  Reallocate 15% of pipeline engineers to the deployment scaling stack to mitigate staging overhead risks.
-
-**Confidence Score:** **96%** (based on data completeness across all uploaded files).`
-        : `### 🚀 توصيات قابلة للتنفيذ لمشروع AIRA
-
-استناداً إلى الملفات المرفوعة، أوصي بخطة التنفيذ التالية:
-
-* **المدى القصير (1-2 أسبوع):** 
-  تحسين خط أنابيب استعلام الفهرسة الخلفي لتقليل زمن انتقال 320ms إلى حد 280ms المقبول.
-* **المدى المتوسط (شهر واحد):**
-  أتمتة عملية إنشاء التقارير عن طريق إنشاء خط أنابيب استيعاب مستمر ومؤتمت لسجلات CSV الجديدة.
-* **المدى الطويل (الربع الثالث 2026):**
-  إعادة تخصيص 15% من مهندسي خطوط الأنابيب إلى مجموعة تطوير النشر للتخفيف من مخاطر أعباء البيئة المؤقتة.
-
-**مستوى الثقة:** **96%** (بناءً على اكتمال البيانات عبر جميع الملفات المرفوعة).`
-    } else {
-      assistantReply = lang === 'en'
-        ? `I've analyzed your custom query: *"${userQuery}"* across the uploaded documents.
-
-Based on the context in **${files[0]?.name || 'your files'}**:
-- The project tracks continuous enhancement metrics.
-- All dependencies are successfully accounted for, and operations are running in stable environment configs.
-
-Let me know if you would like me to compile a **Summary**, run a **Comparison**, or issue a **Final Recommendation** on these topics!`
-        : `لقد قمت بتحليل استفسارك المخصص: *"${userQuery}"* عبر المستندات المرفوعة.
-
-استناداً إلى سياق ملف **${files[0]?.name || 'ملفاتك المرفوعة'}**:
-- يتتبع المشروع مقاييس التحسين المستمرة.
-- تم حساب جميع التبعيات بنجاح، وتعمل العمليات في تكوينات بيئية مستقرة.
-
-أخبرني إذا كنت ترغب في أن أقوم بجمع **ملخص**، أو إجراء **مقارنة**، أو تقديم **توصية نهائية** بشأن هذه المواضيع!`
-    }
-
-    setChatMessages((prev) => [
-      ...prev,
-      {
-        id: Math.random().toString(),
-        role: 'assistant',
-        content: assistantReply,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        actionType: actionLabel
+      if (!response.ok) {
+        throw new Error('Failed to communicate with multi-agent system backend.')
       }
-    ])
+
+      const reader = response.body?.getReader()
+      if (!reader) {
+        throw new Error('No readable response body received from server.')
+      }
+
+      const decoder = new TextDecoder()
+      let buffer = ''
+      let isDone = false
+
+      while (!isDone) {
+        const { done, value } = await reader.read()
+        if (done) {
+          isDone = true
+          break
+        }
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n\n')
+        buffer = lines.pop() || '' // keep the last incomplete chunk in buffer
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const dataStr = line.replace(/^data:\s*/, '').trim()
+            if (!dataStr) continue
+
+            try {
+              const event = JSON.parse(dataStr)
+
+              if (event.type === 'status') {
+                // Display current agent progress text
+                setAnalysisStep(event.message)
+              } else if (event.type === 'token') {
+                // Once we receive the first token, turn off the loading analysis step and show the message stream
+                setIsAnalyzing(false)
+                
+                assistantText += event.content
+
+                setChatMessages((prev) => {
+                  const exists = prev.some((m) => m.id === assistantMessageId)
+                  if (!exists) {
+                    return [
+                      ...prev,
+                      {
+                        id: assistantMessageId,
+                        role: 'assistant',
+                        content: assistantText,
+                        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        actionType: type
+                      }
+                    ]
+                  } else {
+                    return prev.map((m) =>
+                      m.id === assistantMessageId ? { ...m, content: assistantText } : m
+                    )
+                  }
+                })
+              } else if (event.type === 'error') {
+                throw new Error(event.message)
+              } else if (event.type === 'done') {
+                isDone = true
+              }
+            } catch (e) {
+              console.error('Failed to parse SSE JSON payload:', e, line)
+            }
+          }
+        }
+      }
+    } catch (err: any) {
+      console.error('Chat execution error:', err)
+      setIsAnalyzing(false)
+      
+      const errorMessage = lang === 'en'
+        ? `⚠️ **Service Error:** ${err.message || 'Unable to fetch response from AIRA backend. Check if FastAPI server is running.'}`
+        : `⚠️ **خطأ في الخدمة:** ${err.message || 'تعذر جلب الاستجابة من خادم AIRA. يرجى التحقق من تشغيل خادم FastAPI.'}`
+
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          id: Math.random().toString(),
+          role: 'assistant',
+          content: errorMessage,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          actionType: 'normal'
+        }
+      ])
+    }
   }
 
   const resetChat = () => {
@@ -201,3 +207,4 @@ Let me know if you would like me to compile a **Summary**, run a **Comparison**,
   }
 }
 export type UseAIEngineReturn = ReturnType<typeof useAIEngine>
+

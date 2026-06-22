@@ -48,7 +48,7 @@ function App() {
           <div className="my-auto py-8">
             {ai.chatMessages.length === 0 && !ai.isAnalyzing ? (
               /* Welcome Info Area */
-              <div className="space-y-4 text-center md:text-left">
+              <div className="space-y-4 text-center md:text-start">
                 <h1 className="font-oxanium text-3xl sm:text-4xl md:text-5xl font-black leading-tight tracking-tight">
                   <span className="block text-brand-logo dark:text-raspberry-plum-300 font-light mb-2">{t.titlePrefix}</span>
                   <span className="block text-brand-logo dark:text-raspberry-plum-300 font-light">
@@ -104,6 +104,7 @@ function App() {
           t={t}
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
+          sessionId={workspace.sessionId}
         />
       </div>
 

@@ -18,9 +18,11 @@ export const translations = {
     footer: "AIRA v0.1.0 • Secured Data Sandbox",
     analyzing: "AIRA Analyzing...",
     exportReport: "Export Report",
+    viewFile: "View File",
     you: "You",
     airaIntelligence: "AIRA Intelligence",
     noDocsWarning: "⚠️ No documents found. Please drag & drop or select files on the right sidebar first so I can analyze them for you!",
+    noSourceWarning: "There is no source to give you information from.",
     fileTypeError: "Invalid file type. Only PDF and DOCX files are supported.",
     fileSizeError: "File size exceeds the 10MB limit."
   },
@@ -45,7 +47,10 @@ export const translations = {
     exportReport: "تصدير التقرير",
     you: "أنت",
     airaIntelligence: "ذكاء AIRA",
+    viewFile: "عرض الملف",
+    close: "إغلاق", 
     noDocsWarning: "⚠️ لم يتم العثور على مستندات. يرجى سحب وإفلات أو اختيار ملفات من مساحة الملفات أولاً حتى أتمكن من تحليلها لك!",
+    noSourceWarning: "لا يوجد مصدر لأعطيك منه معلومة.",
     fileTypeError: "نوع ملف غير صالح. فقط ملفات PDF و DOCX مدعومة.",
     fileSizeError: "حجم الملف يتجاوز الحد المسموح به وهو 10 ميجابايت."
   }
