@@ -26,7 +26,12 @@ app = FastAPI(title="AIRA AI Research Assistant API", version="1.0.0")
 # Setup CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://aira-front-three.vercel.app/"],
+    allow_origins=[
+        "https://aira-front-three.vercel.app",
+        "https://aira-front-three.vercel.app/",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
