@@ -1,4 +1,4 @@
-# AIRA — AI Research Assistant 🚀
+# AIRA — AI Research Assistant 🚀📄
 
 **AIRA** is a chat-first, responsive AI Research Assistant designed to analyze documents, surface critical evidence, run metrics comparison, and help users make faster, data-driven decisions within a secured data sandbox.
 
@@ -24,7 +24,6 @@ AIRA serves as a bridge between static multi-format documents and actionable exe
 - **💬 Smart Conversational Logic**:
   - When no documents are uploaded, the assistant restricts responses. It only answers questions about its identity (introducing itself as AIRA); otherwise, it replies: *"لا يوجد مصدر لأعطيك منه معلومة."* / *"No source available to provide information."*.
 - **🌐 Bilingual UI (AR/EN)**: Full Support for English (LTR) and Arabic (RTL) layout switching on the fly.
-- **✍️ Premium Arabic Typography**: Integrated with **Noto Kufi Arabic** font applied globally across all elements in Arabic mode for an optimal RTL reading experience.
 - **🌗 Dark / Light Mode**: Beautiful custom tailwind theme adapting seamlessly to lighting preferences.
 - **📱 Ultra-Responsive Design**: Drawer layouts for mobile and comfortable margins (`max-w-6xl`) on desktop.
 
