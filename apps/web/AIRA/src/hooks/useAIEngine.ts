@@ -19,6 +19,7 @@ const isSelfIntro = (q: string): boolean => {
     clean.includes("what's your name") ||
     clean.includes('introduce yourself') ||
     clean.includes('who is aira') ||
+    clean.includes('what is aira') ||
     clean.includes('من أنت') ||
     clean.includes('من انت') ||
     clean.includes('ما اسمك') ||
@@ -80,7 +81,6 @@ export function useAIEngine(
     ])
 
     const assistantMessageId = Math.random().toString()
-    let assistantText = ''
 
     try {
       const sessionId = sessionStorage.getItem('aira_session_id') || ''
@@ -119,17 +119,60 @@ export function useAIEngine(
       const decoder = new TextDecoder()
       let buffer = ''
       let isDone = false
+      let streamEnded = false
+      const tokenQueue: string[] = []
+      let displayedText = ''
+      let typingTimer: any = null
+
+      const startTypingLoop = () => {
+        if (typingTimer) return
+        typingTimer = setInterval(() => {
+          if (tokenQueue.length === 0) {
+            if (streamEnded) {
+              clearInterval(typingTimer)
+              typingTimer = null
+            }
+            return
+          }
+
+          // Dynamic speed batching: pop more characters if queue is large to prevent lag
+          const batchSize = tokenQueue.length > 40 ? 4 : (tokenQueue.length > 15 ? 2 : 1)
+          const nextChars = tokenQueue.splice(0, batchSize).join('')
+          displayedText += nextChars
+
+          setChatMessages((prev) => {
+            const exists = prev.some((m) => m.id === assistantMessageId)
+            if (!exists) {
+              return [
+                ...prev,
+                {
+                  id: assistantMessageId,
+                  role: 'assistant',
+                  content: displayedText,
+                  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                  actionType: type
+                }
+              ]
+            } else {
+              return prev.map((m) =>
+                m.id === assistantMessageId ? { ...m, content: displayedText } : m
+              )
+            }
+          })
+        }, 15) // Smooth 15ms update interval
+      }
 
       while (!isDone) {
         const { done, value } = await reader.read()
         if (done) {
           isDone = true
+          streamEnded = true
           break
         }
 
         buffer += decoder.decode(value, { stream: true })
         const lines = buffer.split('\n\n')
-        buffer = lines.pop() || '' // keep the last incomplete chunk in buffer
+        buffer = lines.pop() || '' 
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
@@ -140,37 +183,18 @@ export function useAIEngine(
               const event = JSON.parse(dataStr)
 
               if (event.type === 'status') {
-                // Display current agent progress text
                 setAnalysisStep(event.message)
               } else if (event.type === 'token') {
-                // Once we receive the first token, turn off the loading analysis step and show the message stream
                 setIsAnalyzing(false)
-                
-                assistantText += event.content
-
-                setChatMessages((prev) => {
-                  const exists = prev.some((m) => m.id === assistantMessageId)
-                  if (!exists) {
-                    return [
-                      ...prev,
-                      {
-                        id: assistantMessageId,
-                        role: 'assistant',
-                        content: assistantText,
-                        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                        actionType: type
-                      }
-                    ]
-                  } else {
-                    return prev.map((m) =>
-                      m.id === assistantMessageId ? { ...m, content: assistantText } : m
-                    )
-                  }
-                })
+                // Queue characters and run typing effect
+                tokenQueue.push(...event.content.split(''))
+                startTypingLoop()
               } else if (event.type === 'error') {
+                streamEnded = true
                 throw new Error(event.message)
               } else if (event.type === 'done') {
                 isDone = true
+                streamEnded = true
               }
             } catch (e) {
               console.error('Failed to parse SSE JSON payload:', e, line)

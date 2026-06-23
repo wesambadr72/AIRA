@@ -23,7 +23,7 @@ def generate_embedding(text: str) -> List[float]:
         return []
     try:
         response = client.models.embed_content(
-            model="text-embedding-004",
+            model="models/gemini-embedding-2",
             contents=text
         )
         if response.embeddings:

@@ -53,7 +53,7 @@ function App() {
                   <span className="block text-brand-logo dark:text-raspberry-plum-300 font-light mb-2">{t.titlePrefix}</span>
                   <span className="block text-brand-logo dark:text-raspberry-plum-300 font-light">
                     {t.titleSuffix}
-                    <span className="inline-block rounded-lg px-3 py-0.5 mx-2 bg-raspberry-plum-200/50 dark:bg-raspberry-plum-900/70 text-brand-logo dark:text-raspberry-plum-300/90 font-semibold shadow-sm italic">
+                    <span className="inline-block rounded-lg px-3 py-0.5 mx-2 bg-raspberry-plum-200/50 dark:bg-raspberry-plum-900/70 text-brand-logo dark:text-raspberry-plum-400 font-semibold shadow-sm italic">
                       {t.Aira}
                     </span>
                   </span>

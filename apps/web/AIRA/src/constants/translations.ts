@@ -1,9 +1,9 @@
 export const translations = {
   en: {
     titlePrefix: "From files",
-    titleSuffix: "to fast decisions with ",
+    titleSuffix: "to accurate decisions with ",
     Aira: "AIRA",
-    subtitle: "Upload documents on the right and ask AIRA to synthesize data, run metrics comparison, or outline actionable next steps.",
+    subtitle: "Upload documents and ask AIRA to synthesize data, run metrics comparison, or outline actionable next steps.",
     placeholder: "Ask AIRA about your documents...",
     chipSummarize: "Summarize the documents",
     chipCompare: "Compare the documents",
@@ -28,9 +28,9 @@ export const translations = {
   },
   ar: {
     titlePrefix: "من الملفات",
-    titleSuffix: "إلى قرارات سريعة مع ",
+    titleSuffix: "إلى قرارات دقيقة مع ",
     Aira: "أيرا",
-    subtitle: "ارفع المستندات في مساحة العمل على اليمين واسأل أيرا لتلخيص البيانات، مقارنة المقاييس، أو تحديد الخطوات التالية الممكنة.",
+    subtitle: "ارفع المستندات في مساحة العمل واسأل أيرا لتلخيص البيانات، مقارنة المقاييس، أو تحديد الخطوات التالية الممكنة.",
     placeholder: "اسأل أيرا عن مستنداتك...",
     chipSummarize: "تلخيص المستندات",
     chipCompare: "مقارنة المستندات",

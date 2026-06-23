@@ -157,17 +157,17 @@ export default function ChatWorkspace({
 
       {isAnalyzing && (
         <div className="flex w-full justify-start">
-          <div className="flex flex-col space-y-3 p-5 rounded-2xl bg-raspberry-plum-950/10 dark:bg-raspberry-plum-950/20 border border-raspberry-plum-900/10 text-start animate-pulse max-w-[85%] sm:max-w-[75%] rounded-ss-none w-full">
-            <div className="flex items-center gap-2 text-xs text-raspberry-plum-400 font-semibold">
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-logo" />
+          <div className="flex flex-col space-y-3 p-5 rounded-2xl bg-white dark:bg-brand-logo/5 border border-raspberry-plum-200/60 dark:border-brand-logo/20 text-start animate-pulse max-w-[85%] sm:max-w-[75%] rounded-ss-none w-full shadow-sm">
+            <div className="flex items-center gap-2 text-xs text-raspberry-plum-700 dark:text-raspberry-plum-500 font-bold">
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-logo dark:text-raspberry-plum-400" />
               <span>{t.analyzing}</span>
             </div>
-            <span className="text-sm text-raspberry-plum-400 dark:text-raspberry-plum-200 font-medium">
+            <span className="text-sm text-slate-800 dark:text-raspberry-plum-600 font-bold">
               {analysisStep}
             </span>
             <div className="space-y-2 mt-1">
-              <div className="h-2 bg-raspberry-plum-950/30 dark:bg-raspberry-plum-950/60 rounded w-5/6"></div>
-              <div className="h-2 bg-raspberry-plum-950/30 dark:bg-raspberry-plum-950/60 rounded w-2/3"></div>
+              <div className="h-2 bg-slate-200/80 dark:bg-raspberry-plum-400/20 rounded w-5/6"></div>
+              <div className="h-2 bg-slate-200/80 dark:bg-raspberry-plum-400/20 rounded w-2/3"></div>
             </div>
           </div>
         </div>
