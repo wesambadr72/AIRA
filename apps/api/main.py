@@ -1,6 +1,8 @@
 import os
 import uuid
 import logging
+import time
+import collections
 from typing import List, Dict, Any
 from fastapi import FastAPI, UploadFile, File, HTTPException, Response
 from fastapi.middleware.cors import CORSMiddleware
@@ -171,11 +173,27 @@ async def view_file_content(file_id: str, sessionId: str):
     }
     return Response(content=file_bytes, media_type=media_type, headers=headers)
 
+# Global rate limit state for chat sessions
+chat_limits = collections.defaultdict(list)
+
 @app.post("/api/chat")
 async def chat_completion(request: ChatRequest):
     """Handles multi-agent chatbot streaming query isolated by session."""
     logger.info(f"Session {request.sessionId}: Received query: '{request.query}'")
     
+    # Rate limit check (20 messages per minute)
+    now = time.time()
+    window_start = now - 60
+    # Clean up timestamps outside the 60-second window
+    chat_limits[request.sessionId] = [t for t in chat_limits[request.sessionId] if t > window_start]
+    if len(chat_limits[request.sessionId]) >= 20:
+        raise HTTPException(
+            status_code=429,
+            detail="Too many messages. Please wait a minute before sending more messages." if request.lang == "en" else "تجاوزت الحد المسموح للرسائل. يرجى الانتظار دقيقة قبل إرسال المزيد من الرسائل."
+        )
+    # Record the request timestamp
+    chat_limits[request.sessionId].append(now)
+
     # 1. Retrieval Agent finds top-K context
     retrieved_chunks = retrieval_agent.retrieve_context(
         session_id=request.sessionId,

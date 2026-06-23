@@ -100,6 +100,14 @@ export function useAIEngine(
       })
 
       if (!response.ok) {
+        if (response.status === 429) {
+          try {
+            const errData = await response.json()
+            throw new Error(errData.detail)
+          } catch {
+            throw new Error(lang === 'ar' ? 'تجاوزت حد الرسائل المسموح به. يرجى الانتظار دقيقة.' : 'Rate limit exceeded. Please wait a minute.')
+          }
+        }
         throw new Error('Failed to communicate with multi-agent system backend.')
       }
 
