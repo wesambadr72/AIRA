@@ -26,7 +26,7 @@ app = FastAPI(title="AIRA AI Research Assistant API", version="1.0.0")
 # Setup CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Frontend can call from dev server directly if proxy is not configured
+    allow_origins=["https://aira-front-three.vercel.app/"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
