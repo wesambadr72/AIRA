@@ -24,7 +24,8 @@ export const translations = {
     noDocsWarning: "⚠️ No documents found. Please drag & drop or select files on the right sidebar first so I can analyze them for you!",
     noSourceWarning: "There is no source to give you information from.",
     fileTypeError: "Invalid file type. Only PDF and DOCX files are supported.",
-    fileSizeError: "File size exceeds the 10MB limit."
+    fileSizeError: "File size exceeds the 10MB limit.",
+    footerLink: "Made by Wesam"
   },
   ar: {
     titlePrefix: "من الملفات",
@@ -52,7 +53,8 @@ export const translations = {
     noDocsWarning: "⚠️ لم يتم العثور على مستندات. يرجى سحب وإفلات أو اختيار ملفات من مساحة الملفات أولاً حتى أتمكن من تحليلها لك!",
     noSourceWarning: "لا يوجد مصدر لأعطيك منه معلومة.",
     fileTypeError: "نوع ملف غير صالح. فقط ملفات PDF و DOCX مدعومة.",
-    fileSizeError: "حجم الملف يتجاوز الحد المسموح به وهو 10 ميجابايت."
+    fileSizeError: "حجم الملف يتجاوز الحد المسموح به وهو 10 ميجابايت.",
+    footerLink: "صنع بواسطة وسام"  
   }
 }
 export type TranslationsType = typeof translations

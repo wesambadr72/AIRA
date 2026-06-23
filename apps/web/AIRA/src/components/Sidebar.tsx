@@ -232,6 +232,7 @@ export default function Sidebar({
           <p className="text-[10px] text-raspberry-plum-400 dark:text-raspberry-plum-300">
             {t.footer}
           </p>
+          <a className="text-[10px] text-raspberry-plum-400 dark:text-raspberry-plum-300 hover:underline hover:text-brand-logo transition-all" href="https://wesamlt.netlify.app/">{t.footerLink}</a>
         </div>
       </aside>
 
@@ -266,6 +267,7 @@ export default function Sidebar({
               <p className="text-[10px] text-raspberry-plum-400 dark:text-raspberry-plum-300/40">
                 {t.footer}
               </p>
+              <a className="text-[10px] text-raspberry-plum-400 dark:text-raspberry-plum-300 hover:underline hover:text-brand-logo transition-all" href="https://wesamlt.netlify.app/">{t.footerLink}</a>
             </div>
           </div>
         </div>
