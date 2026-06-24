@@ -6,7 +6,7 @@ import PromptBar from './components/PromptBar'
 import { useFileWorkspace } from './hooks/useFileWorkspace'
 import { useAIEngine } from './hooks/useAIEngine'
 import { translations } from './constants/translations'
-import { Analytics } from '@vercel/analytics/next';
+import { Analytics } from '@vercel/analytics/react';
 
 
 function App() {
