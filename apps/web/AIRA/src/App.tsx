@@ -6,6 +6,8 @@ import PromptBar from './components/PromptBar'
 import { useFileWorkspace } from './hooks/useFileWorkspace'
 import { useAIEngine } from './hooks/useAIEngine'
 import { translations } from './constants/translations'
+import { Analytics } from '@vercel/analytics/next';
+
 
 function App() {
   const [lang, setLang] = useState<'en' | 'ar'>('en')
@@ -22,12 +24,14 @@ function App() {
   const ai = useAIEngine(workspace.files, lang, t)
 
   return (
-    <div
-      dir={lang === 'ar' ? 'rtl' : 'ltr'}
-      className={`min-h-screen flex flex-col relative selection:bg-raspberry-plum-600/30 selection:text-raspberry-plum-100 transition-colors duration-300 ${
-        isDarkMode ? 'bg-brand-bg text-brand-text' : 'bg-[#FFF0FA] text-brand-bg'
-      }`}
-    >
+    <>
+      <Analytics />
+      <div
+        dir={lang === 'ar' ? 'rtl' : 'ltr'}
+        className={`min-h-screen flex flex-col relative selection:bg-raspberry-plum-600/30 selection:text-raspberry-plum-100 transition-colors duration-300 ${
+          isDarkMode ? 'bg-brand-bg text-brand-text' : 'bg-[#FFF0FA] text-brand-bg'
+        }`}
+      >
 
       {/* Header */}
       <Header
@@ -109,6 +113,7 @@ function App() {
       </div>
 
     </div>
+    </>
   )
 }
 
